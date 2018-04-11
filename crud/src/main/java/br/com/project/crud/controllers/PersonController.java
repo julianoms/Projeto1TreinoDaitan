@@ -8,15 +8,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class CreateController {
+public class PersonController {
 
     @Autowired
     private PersonRepository personRepository;
 
     @RequestMapping("/create")
-    public Person create(@RequestParam(value = "name", defaultValue = "teste")String name){
-        
-        Person person =  new Person(name,"bra");
-        return person;
+    public String create(@RequestParam(value = "name", defaultValue = "João")String name, @RequestParam(value = "country", defaultValue = "Brasil") String country){
+
+        Person person =  new Person(name,country);
+        personRepository.save(person);
+        return person.toString() + "Cadastrado com sucesso ";
     }
 }
