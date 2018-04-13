@@ -2,13 +2,11 @@ package br.com.project.crud.controllers;
 
 import br.com.project.crud.daos.PersonRepository;
 import br.com.project.crud.models.Person;
+import br.com.project.crud.models.ReturnObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import java.util.List;
 
 @RestController
 public class PersonController {
@@ -16,30 +14,43 @@ public class PersonController {
     @Autowired
     private PersonRepository personRepository;
 
-    @RequestMapping("/create")
-    public String create(@RequestParam(value = "name", defaultValue = "João")String name, @RequestParam(value = "country", defaultValue = "Brasil") String country){
+    @PostMapping("/create")
+    public ReturnObject create(@RequestParam(value = "name", defaultValue = "João")String name, @RequestParam(value = "country", defaultValue = "Brasil") String country){
 
         Person person =  new Person(name,country);
-        personRepository.save(person);
-        return person.toString() + "Cadastrado com sucesso ";
+        personRepository.savePerson(person);
+
+            return new ReturnObject("OK", "Person was included",person);
     }
 
     @RequestMapping("/read")
-    public Iterable<Person> read(){
-        return personRepository.findAll();
+    public ReturnObject read(){
+        List<Person> people= personRepository.findAll();
+        return new ReturnObject("OK","Selection of all person intities",people);
     }
+
+
 
     @RequestMapping("/update/{id}")
-    public Person update (@PathVariable(value = "id")long id, @RequestParam(value = "name", defaultValue = "teste")String name, @RequestParam(value = "country",defaultValue = "teste")String country){
+    public Person update (@PathVariable(value = "id")long id, @RequestParam(value = "name")String name, @RequestParam(value = "country")String country) {
 
-        Optional<Person> optional = personRepository.findById(id);
-        Person person = optional.get();
+        Person person = personRepository.findById(id);
         person.setName(name);
         person.setCountry(country);
+        return personRepository.merge(person);
 
-        Person updatedperson = personRepository.save(person);
-        return updatedperson;
     }
 
+    @RequestMapping("/delete/{id}")
+    public String delete ( @PathVariable(value = "id") long id) throws Exception {
+
+        personRepository.deleteById(id);
+        return "Person deleted ";
+    }
+
+    @RequestMapping("/readByName")
+    public Iterable<Person> readByName(@RequestParam String name){
+        return personRepository.findByName(name );
+    }
 
 }

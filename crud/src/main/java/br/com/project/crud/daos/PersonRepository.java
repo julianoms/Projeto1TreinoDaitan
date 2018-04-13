@@ -1,12 +1,56 @@
 package br.com.project.crud.daos;
 
 import br.com.project.crud.models.Person;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 import java.util.List;
 
-public interface PersonRepository extends CrudRepository<Person,Long> {
+@Repository
+public class PersonRepository {
 
-    List<Person> findByName(String name);
+    @PersistenceContext
+    private EntityManager entity;
+
+
+    @Transactional
+    public List<Person> findByName(String name){
+        String query = String.format("select * from person where name ='%s';",name);
+        return entity.createNativeQuery(query).getResultList();
+    }
+
+    @Transactional
+    public void savePerson(Person person){
+        entity.persist(person);
+    }
+
+
+    @Transactional
+    public Person findById(long id){
+
+        return entity.find(Person.class,id);
+    }
+    @Transactional
+    public Person merge(Person person){
+
+        return entity.merge(person);
+    }
+
+    @Transactional
+    public List<Person> findAll(){
+        return  entity.createNativeQuery("select * from person;").getResultList();
+    }
+
+    @Transactional
+    public void deleteById (long id) throws Exception{
+        try {
+            entity.createNativeQuery("delete from person where id = :id").setParameter("id", id).executeUpdate();
+        }
+        catch (Exception e){
+            throw new Exception(e);
+        }
+    }
 
 }
