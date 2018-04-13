@@ -4,6 +4,8 @@ import br.com.project.crud.daos.PersonRepository;
 import br.com.project.crud.models.Person;
 import br.com.project.crud.models.ReturnObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,20 +17,23 @@ public class PersonController {
     private PersonRepository personRepository;
 
     @PostMapping("/create")
-    public ReturnObject create(@RequestParam(value = "name", defaultValue = "João")String name, @RequestParam(value = "country", defaultValue = "Brasil") String country){
+    public ResponseEntity create(@RequestParam(value = "name", defaultValue = "João")String name, @RequestParam(value = "country", defaultValue = "Brasil") String country){
 
         Person person =  new Person(name,country);
         personRepository.savePerson(person);
 
-            return new ReturnObject("OK", "Person was included",person);
+        ReturnObject object = new ReturnObject(HttpStatus.CREATED.toString(),"Person was included",person);
+        return new ResponseEntity(object,HttpStatus.CREATED);
     }
 
     @RequestMapping("/read")
-    public ReturnObject read(){
+    public ResponseEntity read(){
         List<Person> people= personRepository.findAll();
-        return new ReturnObject("OK","Selection of all person intities",people);
-    }
+        ReturnObject object = new ReturnObject(HttpStatus.OK.toString(),"List of all included people",people);
 
+     //     return new ReturnObject(HttpStatus,"Selection of all person entities",people);
+        return new ResponseEntity(object,HttpStatus.OK);
+    }
 
 
     @RequestMapping("/update/{id}")
