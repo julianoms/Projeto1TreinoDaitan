@@ -4,13 +4,13 @@ import org.springframework.hateoas.ResourceSupport;
 
 import java.util.Collection;
 
-public class ReturnObjectRead extends ResourceSupport {
+public class ReturnObjectList extends ResourceSupport {
 
     private String Status;
     private String Message;
     private Collection<Person> people;
 
-    public ReturnObjectRead(String status, String message, Collection<Person> people) {
+    public ReturnObjectList(String status, String message, Collection<Person> people) {
         Status = status;
         Message = message;
         this.people = people;

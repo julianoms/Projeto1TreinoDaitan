@@ -18,7 +18,7 @@ public class PersonRepository {
     @Transactional
     public List<Person> findByName(String name){
         String query = String.format("select * from person where name ='%s';",name);
-        return entity.createNativeQuery(query).getResultList();
+        return entity.createNativeQuery(query,Person.class).getResultList();
     }
 
     @Transactional
@@ -40,17 +40,13 @@ public class PersonRepository {
 
     @Transactional
     public List<Person> findAll(){
-        return  entity.createNativeQuery("select * from person;").getResultList();
+        return  entity.createNativeQuery("select * from person;", Person.class).getResultList();
     }
 
     @Transactional
-    public void deleteById (long id) throws Exception{
-        try {
+    public void deleteById (long id){
             entity.createNativeQuery("delete from person where id = :id").setParameter("id", id).executeUpdate();
-        }
-        catch (Exception e){
-            throw new Exception(e);
-        }
+
     }
 
 }

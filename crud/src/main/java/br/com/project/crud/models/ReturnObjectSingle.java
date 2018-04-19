@@ -2,22 +2,20 @@ package br.com.project.crud.models;
 
 
 import org.springframework.hateoas.ResourceSupport;
-import org.springframework.lang.Nullable;
 
-public class ReturnObject extends ResourceSupport {
+public class ReturnObjectSingle extends ResourceSupport {
 
     private String Status;
     private String Message;
-    @Nullable
     private Person person;
 
 
-    public ReturnObject(String status, String message) {
+    public ReturnObjectSingle(String status, String message) {
         Status = status;
         Message = message;
     }
 
-    public ReturnObject(String status, String message, Person person) {
+    public ReturnObjectSingle(String status, String message, Person person) {
         Status = status;
         Message = message;
         this.person = person;

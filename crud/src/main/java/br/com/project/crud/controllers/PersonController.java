@@ -3,59 +3,80 @@ package br.com.project.crud.controllers;
 import br.com.project.crud.daos.PersonRepository;
 import br.com.project.crud.models.Person;
 import br.com.project.crud.models.ReturnObject;
+import br.com.project.crud.models.ReturnObjectList;
+import br.com.project.crud.models.ReturnObjectSingle;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
 @RestController
+@RequestMapping("/person")
 public class PersonController {
 
     @Autowired
     private PersonRepository personRepository;
 
     @PostMapping("/create")
-    public ResponseEntity create(@RequestParam(value = "name", defaultValue = "João")String name, @RequestParam(value = "country", defaultValue = "Brasil") String country){
+    public ResponseEntity<ReturnObjectSingle> create(
+            @RequestParam(value = "name") String name, @RequestParam(value = "country") String country)  {
 
         Person person =  new Person(name,country);
         personRepository.savePerson(person);
 
-        ReturnObject object = new ReturnObject(HttpStatus.CREATED.toString(),"Person was included",person);
-        return new ResponseEntity(object,HttpStatus.CREATED);
+        ReturnObjectSingle object = new ReturnObjectSingle("created","Person created",person);
+        object.add(linkTo(methodOn(PersonController.class).readById(person.getId())).withSelfRel());
+        object.add(linkTo(methodOn(PersonController.class).delete(person.getId())).withRel("Delete"));
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
+
+        return ResponseEntity.created(uri).body(object);
     }
 
     @RequestMapping("/read")
-    public ResponseEntity read(){
+    public ResponseEntity<ReturnObjectList> read(){
         List<Person> people= personRepository.findAll();
-        ReturnObject object = new ReturnObject(HttpStatus.OK.toString(),"List of all included people",people);
-
-     //     return new ReturnObject(HttpStatus,"Selection of all person entities",people);
-        return new ResponseEntity(object,HttpStatus.OK);
+        ReturnObjectList object = new ReturnObjectList("Ok","List of all included people", people);
+        object.add(linkTo(PersonController.class).withSelfRel());
+        return ResponseEntity.ok(object);
     }
 
-
     @RequestMapping("/update/{id}")
-    public Person update (@PathVariable(value = "id")long id, @RequestParam(value = "name")String name, @RequestParam(value = "country")String country) {
+    public ResponseEntity<ReturnObjectSingle> update (@PathVariable(value = "id")long id, @RequestParam(value = "name")String name, @RequestParam(value = "country")String country) {
 
         Person person = personRepository.findById(id);
         person.setName(name);
         person.setCountry(country);
-        return personRepository.merge(person);
+        personRepository.merge(person);
+
+        ReturnObjectSingle object = new ReturnObjectSingle("Ok","Person Updated",person);
+        object.add(linkTo(methodOn(PersonController.class).readById(person.getId())).withSelfRel());
+        object.add(linkTo(methodOn(PersonController.class).delete(person.getId())).withRel("Delete"));
+        return  ResponseEntity.ok(object);
 
     }
 
     @RequestMapping("/delete/{id}")
-    public String delete ( @PathVariable(value = "id") long id) throws Exception {
+    public ResponseEntity<ReturnObject> delete (@PathVariable(value = "id") long id)  {
 
         personRepository.deleteById(id);
-        return "Person deleted ";
+        ReturnObject object = new ReturnObject("deleted","Person Deleted");
+        return ResponseEntity.ok(object);
     }
 
     @RequestMapping("/readByName")
     public Iterable<Person> readByName(@RequestParam String name){
         return personRepository.findByName(name );
+    }
+
+    @GetMapping("/read/{id}")
+    public Person readById(@PathVariable(value = "id") long id){
+        return personRepository.findById(id);
     }
 
 }

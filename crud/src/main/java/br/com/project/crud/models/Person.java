@@ -20,7 +20,6 @@ public class Person {
         this.name = name;
         this.country = country;
     }
-
     public long getId() {
         return id;
     }
@@ -43,14 +42,5 @@ public class Person {
 
     public void setCountry(String country) {
         this.country = country;
-    }
-
-    @Override
-    public String toString() {
-        return "Person{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", country='" + country + '\'' +
-                '}';
     }
 }
