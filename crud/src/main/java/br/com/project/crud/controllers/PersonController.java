@@ -1,10 +1,10 @@
 package br.com.project.crud.controllers;
 
-import br.com.project.crud.daos.PersonRepository;
 import br.com.project.crud.models.Person;
 import br.com.project.crud.models.ReturnObject;
 import br.com.project.crud.models.ReturnObjectList;
 import br.com.project.crud.models.ReturnObjectSingle;
+import br.com.project.crud.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,62 +21,66 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 public class PersonController {
 
     @Autowired
-    private PersonRepository personRepository;
+    private PersonService personService;
 
     @PostMapping("/create")
-    public ResponseEntity<ReturnObjectSingle> create(
-            @RequestParam(value = "name") String name, @RequestParam(value = "country") String country)  {
+    public ResponseEntity<ReturnObject> create(@RequestBody Person person) {
 
-        Person person =  new Person(name,country);
-        personRepository.savePerson(person);
+        personService.CreatePerson(person);
 
-        ReturnObjectSingle object = new ReturnObjectSingle("created","Person created",person);
-        object.add(linkTo(methodOn(PersonController.class).readById(person.getId())).withSelfRel());
-        object.add(linkTo(methodOn(PersonController.class).delete(person.getId())).withRel("Delete"));
+        ReturnObject object = new ReturnObject("created","Person created");
+        object.add(linkTo(methodOn(PersonController.class).readById(person.getId())).withSelfRel().withType("GET"));
+        object.add(linkTo(methodOn(PersonController.class).delete(person.getId())).withRel("Delete").withType("DELETE"));
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
 
         return ResponseEntity.created(uri).body(object);
     }
 
-    @RequestMapping("/read")
+    @GetMapping("/read")
     public ResponseEntity<ReturnObjectList> read(){
-        List<Person> people= personRepository.findAll();
+        List<Person> people = personService.GetPeople();
         ReturnObjectList object = new ReturnObjectList("Ok","List of all included people", people);
         object.add(linkTo(PersonController.class).withSelfRel());
         return ResponseEntity.ok(object);
     }
 
-    @RequestMapping("/update/{id}")
-    public ResponseEntity<ReturnObjectSingle> update (@PathVariable(value = "id")long id, @RequestParam(value = "name")String name, @RequestParam(value = "country")String country) {
+    @PutMapping("/{id}")
+    public ResponseEntity<ReturnObject> update (
+             @PathVariable(value = "id")long id, @RequestBody Person person){
 
-        Person person = personRepository.findById(id);
-        person.setName(name);
-        person.setCountry(country);
-        personRepository.merge(person);
+        person.setId(personService.GetPersonById(id).getId());
+        personService.updatePerson(person);
 
-        ReturnObjectSingle object = new ReturnObjectSingle("Ok","Person Updated",person);
-        object.add(linkTo(methodOn(PersonController.class).readById(person.getId())).withSelfRel());
-        object.add(linkTo(methodOn(PersonController.class).delete(person.getId())).withRel("Delete"));
+        ReturnObject object = new ReturnObject("Ok","Person Updated");
+        object.add(linkTo(methodOn(PersonController.class).readById(person.getId())).withSelfRel().withType("GET"));
+        object.add(linkTo(methodOn(PersonController.class).delete(person.getId())).withRel("Delete").withType("DELETE"));
         return  ResponseEntity.ok(object);
 
     }
 
-    @RequestMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<ReturnObject> delete (@PathVariable(value = "id") long id)  {
 
-        personRepository.deleteById(id);
+        personService.deletePerson(id);
         ReturnObject object = new ReturnObject("deleted","Person Deleted");
         return ResponseEntity.ok(object);
     }
 
     @RequestMapping("/readByName")
-    public Iterable<Person> readByName(@RequestParam String name){
-        return personRepository.findByName(name );
+    public ResponseEntity<ReturnObjectList> readByName(@RequestBody String name){
+        List<Person> people = personService.getPersonByName(name);
+        ReturnObjectList object = new ReturnObjectList("Ok","List of people named :"+name,people);
+        object.add(linkTo(PersonController.class).withSelfRel());
+        return ResponseEntity.ok(object);
     }
 
-    @GetMapping("/read/{id}")
-    public Person readById(@PathVariable(value = "id") long id){
-        return personRepository.findById(id);
+    @GetMapping("/{id}")
+    public ResponseEntity<ReturnObjectSingle> readById(@PathVariable(value = "id") Long id){
+        Person person = personService.GetPersonById(id);
+        ReturnObjectSingle object = new ReturnObjectSingle("Ok","Person retrieved",person);
+        object.add(linkTo(methodOn(PersonController.class).readById(person.getId())).withSelfRel().withType("GET"));
+        object.add(linkTo(methodOn(PersonController.class).delete(person.getId())).withRel("Delete").withType("DELETE"));
+        return ResponseEntity.ok(object);
     }
 
 }

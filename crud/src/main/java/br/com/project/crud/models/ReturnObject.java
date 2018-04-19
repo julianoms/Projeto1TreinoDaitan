@@ -1,11 +1,13 @@
 package br.com.project.crud.models;
 
-public class ReturnObject {
+import org.springframework.hateoas.ResourceSupport;
+
+public class ReturnObject extends ResourceSupport {
 
     private String Status;
     private String Message;
 
-    public ReturnObject(String status, String message) {
+    public ReturnObject (String status, String message) {
         Status = status;
         Message = message;
     }
