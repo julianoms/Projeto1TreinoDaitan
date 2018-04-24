@@ -2,6 +2,7 @@ package br.com.project.crud.service;
 
 import br.com.project.crud.daos.PersonRepository;
 import br.com.project.crud.models.Person;
+import br.com.project.crud.utils.PersonNotFoundExeption;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +16,14 @@ public class PersonService {
     private PersonRepository personRepository;
 
 
-    public Person GetPersonById(long id){
-        Person obj = personRepository.findById(id).get();
-        return obj;
+    public Person GetPersonById(long id) throws PersonNotFoundExeption {
+
+        if (!personRepository.findById(id).isPresent()){
+            throw new PersonNotFoundExeption(id);
+        }
+        return personRepository.findById(id).get();
     }
+
     public List<Person> GetPeople(){
         List<Person> list = new ArrayList<>();
         personRepository.findAll().forEach(e -> list.add(e));
@@ -31,7 +36,10 @@ public class PersonService {
     public void updatePerson(Person person){
         personRepository.save(person);
     }
-    public void deletePerson(long id){
+    public void deletePerson(long id) throws PersonNotFoundExeption {
+        if (!personRepository.findById(id).isPresent()){
+            throw new PersonNotFoundExeption(id);
+        }
         personRepository.deleteById(id);
     }
     public List<Person> getPersonByName(String name){
