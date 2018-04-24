@@ -1,16 +1,29 @@
-package br.com.project.crud.models;
+package br.com.project.crud.utils;
 
+import br.com.project.crud.models.Person;
 import org.springframework.hateoas.ResourceSupport;
 
 import java.util.Collection;
 
-public class ReturnObjectList extends ResourceSupport {
+public class ReturnObject extends ResourceSupport {
 
     private String Status;
     private String Message;
+    private Person person;
     private Collection<Person> people;
 
-    public ReturnObjectList(String status, String message, Collection<Person> people) {
+    public ReturnObject (String status, String message) {
+        Status = status;
+        Message = message;
+    }
+
+    public ReturnObject(String status, String message, Person person) {
+        Status = status;
+        Message = message;
+        this.person = person;
+    }
+
+    public ReturnObject(String status, String message, Collection<Person> people) {
         Status = status;
         Message = message;
         this.people = people;
@@ -30,6 +43,14 @@ public class ReturnObjectList extends ResourceSupport {
 
     public void setMessage(String message) {
         Message = message;
+    }
+
+    public Person getPerson() {
+        return person;
+    }
+
+    public void setPerson(Person person) {
+        this.person = person;
     }
 
     public Collection<Person> getPeople() {

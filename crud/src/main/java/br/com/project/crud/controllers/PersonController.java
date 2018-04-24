@@ -1,11 +1,10 @@
 package br.com.project.crud.controllers;
 
 import br.com.project.crud.models.Person;
-import br.com.project.crud.models.ReturnObject;
-import br.com.project.crud.models.ReturnObjectList;
-import br.com.project.crud.models.ReturnObjectSingle;
+import br.com.project.crud.utils.ReturnObject;
 import br.com.project.crud.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -37,10 +36,10 @@ public class PersonController {
     }
 
     @GetMapping("/read")
-    public ResponseEntity<ReturnObjectList> read(){
+    public ResponseEntity<ReturnObject> read(){
         List<Person> people = personService.GetPeople();
-        ReturnObjectList object = new ReturnObjectList("Ok","List of all included people", people);
-        object.add(linkTo(PersonController.class).withSelfRel());
+        ReturnObject object = new ReturnObject("Ok","List of all included people", people);
+        object.add(linkTo(PersonController.class).withRel("read"));
         return ResponseEntity.ok(object);
     }
 
@@ -67,19 +66,27 @@ public class PersonController {
     }
 
     @RequestMapping("/readByName")
-    public ResponseEntity<ReturnObjectList> readByName(@RequestBody String name){
+    public ResponseEntity<ReturnObject> readByName(@RequestBody String name){
         List<Person> people = personService.getPersonByName(name);
-        ReturnObjectList object = new ReturnObjectList("Ok","List of people named :"+name,people);
+        ReturnObject object = new ReturnObject("Ok","List of people named :"+name,people);
         object.add(linkTo(PersonController.class).withSelfRel());
         return ResponseEntity.ok(object);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ReturnObjectSingle> readById(@PathVariable(value = "id") Long id){
+    public ResponseEntity<ReturnObject> readById(@PathVariable(value = "id") Long id){
         Person person = personService.GetPersonById(id);
-        ReturnObjectSingle object = new ReturnObjectSingle("Ok","Person retrieved",person);
+        ReturnObject object = new ReturnObject("Ok","Person retrieved",person);
         object.add(linkTo(methodOn(PersonController.class).readById(person.getId())).withSelfRel().withType("GET"));
         object.add(linkTo(methodOn(PersonController.class).delete(person.getId())).withRel("Delete").withType("DELETE"));
+        return ResponseEntity.ok(object);
+    }
+
+    @RequestMapping("")
+    public ResponseEntity<ReturnObject> index (){
+        ReturnObject object = new ReturnObject("Ok","Person index");
+        object.add(new Link("http://localhost:8080/person","self"));
+        object.add(new Link("http://localhost:8080/person/read","people"));
         return ResponseEntity.ok(object);
     }
 
