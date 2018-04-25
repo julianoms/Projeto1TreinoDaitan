@@ -1,4 +1,4 @@
-package br.com.project.crud.service;
+package br.com.project.crud.services;
 
 import br.com.project.crud.daos.PersonRepository;
 import br.com.project.crud.models.Person;
@@ -21,7 +21,7 @@ public class PersonService {
     @Autowired
     private PersonRepository personRepository;
 
-    @Cacheable(value = "person",key = "#id")
+    //@Cacheable(value = "person",key = "#id")
     public Person GetPersonById(long id) throws PersonNotFoundExeption {
 
         if (!personRepository.findById(id).isPresent()){
@@ -36,13 +36,13 @@ public class PersonService {
         return list;
     }
     @Transactional(propagation = Propagation.REQUIRED,readOnly = false)
-    @CachePut(value = "person",key = "#result.id")
+    //@CachePut(value = "person",key = "#person.id")
     public void CreatePerson(Person person){
 
         personRepository.save(person);
     }
     @Transactional(propagation = Propagation.REQUIRED,readOnly = false)
-    @CachePut(value = "person",key = "#person.id")
+    //@CachePut(value = "person",key = "#person.id")
     public void updatePerson(Person person) throws PersonNotFoundExeption {
         if (!personRepository.findById(person.getId()).isPresent()) {
             throw new PersonNotFoundExeption(person.getId());
@@ -50,7 +50,7 @@ public class PersonService {
         personRepository.save(person);
     }
     @Transactional(propagation = Propagation.REQUIRED,readOnly = false)
-    @CacheEvict(value = "person",key = "#id")
+    //@CacheEvict(value = "person",key = "#id")
     public void deletePerson(long id) throws PersonNotFoundExeption {
 
         if (!personRepository.findById(id).isPresent()){
@@ -63,7 +63,7 @@ public class PersonService {
         return personRepository.findByName(name);
     }
 
-    @CacheEvict(value = "person",allEntries = true)
+    //@CacheEvict(value = "person",allEntries = true)
     public void evictCache(){}
 
 }

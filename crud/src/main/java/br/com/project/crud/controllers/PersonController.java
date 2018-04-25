@@ -3,7 +3,7 @@ package br.com.project.crud.controllers;
 import br.com.project.crud.models.Person;
 import br.com.project.crud.utils.PersonNotFoundExeption;
 import br.com.project.crud.utils.ReturnObject;
-import br.com.project.crud.service.PersonService;
+import br.com.project.crud.services.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +26,6 @@ public class PersonController {
     @PostMapping("/create")
     public ResponseEntity<ReturnObject> create(@RequestBody Person person) throws PersonNotFoundExeption {
 
-        System.out.println(person);
         personService.CreatePerson(person);
 
         ReturnObject object = new ReturnObject("created","Person created");
@@ -64,6 +63,7 @@ public class PersonController {
 
         personService.deletePerson(id);
         ReturnObject object = new ReturnObject("deleted","Person Deleted");
+        object.add(linkTo(PersonController.class).withRel("index"));
         return ResponseEntity.ok(object);
     }
 
