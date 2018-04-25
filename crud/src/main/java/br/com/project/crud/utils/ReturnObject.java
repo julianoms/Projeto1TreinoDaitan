@@ -1,4 +1,4 @@
-package br.com.project.crud.models;
+package br.com.project.crud.utils;
 
 import org.springframework.hateoas.ResourceSupport;
 

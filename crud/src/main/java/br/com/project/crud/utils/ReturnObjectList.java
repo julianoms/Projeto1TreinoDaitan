@@ -1,5 +1,6 @@
-package br.com.project.crud.models;
+package br.com.project.crud.utils;
 
+import br.com.project.crud.models.Person;
 import org.springframework.hateoas.ResourceSupport;
 
 import java.util.Collection;

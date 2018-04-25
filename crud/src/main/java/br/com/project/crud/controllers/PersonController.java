@@ -1,10 +1,11 @@
 package br.com.project.crud.controllers;
 
 import br.com.project.crud.models.Person;
-import br.com.project.crud.models.ReturnObject;
-import br.com.project.crud.models.ReturnObjectList;
-import br.com.project.crud.models.ReturnObjectSingle;
-import br.com.project.crud.service.PersonService;
+import br.com.project.crud.utils.PersonNotFoundExeption;
+import br.com.project.crud.utils.ReturnObject;
+import br.com.project.crud.utils.ReturnObjectList;
+import br.com.project.crud.utils.ReturnObjectSingle;
+import br.com.project.crud.services.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class PersonController {
     private PersonService personService;
 
     @PostMapping("/create")
-    public ResponseEntity<ReturnObject> create(@RequestBody Person person) {
+    public ResponseEntity<ReturnObject> create(@RequestBody Person person) throws PersonNotFoundExeption {
 
         personService.CreatePerson(person);
 
@@ -46,7 +47,7 @@ public class PersonController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ReturnObject> update (
-             @PathVariable(value = "id")long id, @RequestBody Person person){
+             @PathVariable(value = "id")long id, @RequestBody Person person) throws PersonNotFoundExeption {
 
         person.setId(personService.GetPersonById(id).getId());
         personService.updatePerson(person);
@@ -75,8 +76,12 @@ public class PersonController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ReturnObjectSingle> readById(@PathVariable(value = "id") Long id){
+    public ResponseEntity<ReturnObjectSingle> readById(@PathVariable(value = "id") Long id) throws PersonNotFoundExeption {
+
         Person person = personService.GetPersonById(id);
+
+
+
         ReturnObjectSingle object = new ReturnObjectSingle("Ok","Person retrieved",person);
         object.add(linkTo(methodOn(PersonController.class).readById(person.getId())).withSelfRel().withType("GET"));
         object.add(linkTo(methodOn(PersonController.class).delete(person.getId())).withRel("Delete").withType("DELETE"));

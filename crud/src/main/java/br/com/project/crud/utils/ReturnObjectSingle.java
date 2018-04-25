@@ -1,6 +1,7 @@
-package br.com.project.crud.models;
+package br.com.project.crud.utils;
 
 
+import br.com.project.crud.models.Person;
 import org.springframework.hateoas.ResourceSupport;
 
 public class ReturnObjectSingle extends ResourceSupport {
