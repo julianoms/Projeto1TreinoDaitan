@@ -26,6 +26,7 @@ public class PersonController {
     @PostMapping("/create")
     public ResponseEntity<ReturnObject> create(@RequestBody Person person) throws PersonNotFoundExeption {
 
+        System.out.println(person);
         personService.CreatePerson(person);
 
         ReturnObject object = new ReturnObject("created","Person created");

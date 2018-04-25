@@ -1,4 +1,4 @@
-package br.com.project.crud.batchs;
+package br.com.project.crud.logs;
 
 import br.com.project.crud.models.Person;
 import br.com.project.crud.service.PersonService;
