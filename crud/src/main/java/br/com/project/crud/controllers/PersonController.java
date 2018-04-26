@@ -68,9 +68,9 @@ public class PersonController {
     }
 
     @RequestMapping("/readByName")
-    public ResponseEntity<ReturnObject> readByName(@RequestBody String name){
-        List<Person> people = personService.getPersonByName(name);
-        ReturnObject object = new ReturnObject("Ok","List of people named :"+name,people);
+    public ResponseEntity<ReturnObject> readByName(@RequestBody Person person){
+        List<Person> people = personService.getPersonByName(person.getName());
+        ReturnObject object = new ReturnObject("Ok","List of people named :"+person.getName(),people);
         object.add(linkTo(PersonController.class).withSelfRel());
         return ResponseEntity.ok(object);
     }
