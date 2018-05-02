@@ -16,8 +16,8 @@ public class UserRepository {
         entityManager.persist(user);
     }
 
-    public User findByName(User user){
-        String query = String.format("select * from user where name ='%s';",user.getUsername());
+    public User findByName(String name){
+        String query = String.format("select * from user where name ='%s';",name);
         return (User)entityManager.createNativeQuery(query,User.class).getSingleResult();
 
     }

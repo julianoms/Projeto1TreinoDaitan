@@ -22,6 +22,6 @@ public class UserService {
 
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
     public User getUserByName(User user){
-        return repository.findByName(user);
+        return repository.findByName(user.getUsername());
     }
 }
