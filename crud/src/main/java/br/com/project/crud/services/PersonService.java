@@ -37,11 +37,10 @@ public class PersonService {
         return list;
     }
     @Transactional(propagation = Propagation.REQUIRED,readOnly = false)
-    @CachePut(value = "person",key = "#person.id")
     public void CreatePerson(Person person){
-
         personRepository.save(person);
     }
+
     @Transactional(propagation = Propagation.REQUIRED,readOnly = false)
     @Caching(
             evict = @CacheEvict(value = "person",key = "#person.id"),
@@ -52,6 +51,7 @@ public class PersonService {
         }
         personRepository.save(person);
     }
+
     @Transactional(propagation = Propagation.REQUIRED,readOnly = false)
     @CacheEvict(value = "person",key = "#id")
     public void deletePerson(long id) throws PersonNotFoundExeption {
@@ -65,8 +65,11 @@ public class PersonService {
     public List<Person> getPersonByName(String name){
         return personRepository.findByName(name);
     }
+    public List<Person> getPersonByCountry(String country){
+        return personRepository.findByCountry(country);
+    }
 
-    //@CacheEvict(value = "person",allEntries = true)
+    @CacheEvict(value = "person",allEntries = true)
     public void evictCache(){}
 
 }
