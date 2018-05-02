@@ -1,7 +1,7 @@
-package br.com.project.crud.batchs;
+package br.com.project.crud.logs;
 
 import br.com.project.crud.models.Person;
-import br.com.project.crud.service.PersonService;
+import br.com.project.crud.services.PersonService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,12 +21,12 @@ public class PersonBatch {
     @Scheduled(
             cron = "0,30 * * * * *")
     public void cronJob() {
-        logger.info("> ScheduleJob");
+        logger.info("***** > ScheduleJob *****");
 
         Collection<Person> people = personService.GetPeople();
         logger.info("There are {} People in the data base.",
                 people.size());
 
-        logger.info("< ScheduleJob");
+        logger.info("***** < ScheduleJob *****");
     }
 }

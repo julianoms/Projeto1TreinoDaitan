@@ -1,4 +1,4 @@
-package br.com.project.crud.service;
+package br.com.project.crud.services;
 
 import br.com.project.crud.daos.PersonRepository;
 import br.com.project.crud.models.Person;
@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,13 +37,15 @@ public class PersonService {
         return list;
     }
     @Transactional(propagation = Propagation.REQUIRED,readOnly = false)
-    @CachePut(value = "person",key = "#result.id")
+    @CachePut(value = "person",key = "#person.id")
     public void CreatePerson(Person person){
 
         personRepository.save(person);
     }
     @Transactional(propagation = Propagation.REQUIRED,readOnly = false)
-    @CachePut(value = "person",key = "#person.id")
+    @Caching(
+            evict = @CacheEvict(value = "person",key = "#person.id"),
+            put = @CachePut(value = "person",key = "#person.id"))
     public void updatePerson(Person person) throws PersonNotFoundExeption {
         if (!personRepository.findById(person.getId()).isPresent()) {
             throw new PersonNotFoundExeption(person.getId());
@@ -63,7 +66,7 @@ public class PersonService {
         return personRepository.findByName(name);
     }
 
-    @CacheEvict(value = "person",allEntries = true)
+    //@CacheEvict(value = "person",allEntries = true)
     public void evictCache(){}
 
 }
