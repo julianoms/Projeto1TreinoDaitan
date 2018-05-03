@@ -27,17 +27,17 @@ public class PersonController {
     private PersonService personService;
 
     @PostMapping
-    public ResponseEntity<ReturnObjectSingle> create(@RequestBody Person person) throws PersonNotFoundExeption {
+    public ResponseEntity<ReturnObj> create(@RequestBody Person person) throws PersonNotFoundExeption {
 
         personService.CreatePerson(person);
 
-        ReturnObjectSingle object = new ReturnObjectSingle("created","Person created");
-        object.add(linkTo(methodOn(PersonController.class).readById(person.getId())).withSelfRel().withType("GET"));
-        object.add(linkTo(methodOn(PersonController.class).delete(person.getId())).withRel("Delete").withType("DELETE"));
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
+        List<ReturnObjectSingle> returnList = ResponseSingleCreator(person);
+        ReturnObj returnObj = new ReturnObj("Ok","Person Created",returnList);
 
-        return ResponseEntity.created(uri).body(object);
+
+        return  ResponseEntity.ok(returnObj);
     }
+
 
     @GetMapping
     public ResponseEntity<ReturnObj> read(@Param(value = "name")String name,
@@ -62,65 +62,50 @@ public class PersonController {
 
         ResponseListCreator(people, returnList);
         ReturnObj returnObj = new ReturnObj("Ok","List of all people:",returnList);
-        System.out.println(returnObj.toString());
-
-//        class Teste2 extends ResourceSupport{
-//            public String teste2;
-//
-//            public Teste2(String name){
-//                this.teste2 = name;
-//            }
-//        }
-//
-//        class Teste  {
-//            public String teste;
-//            public List<Teste2> list;
-//
-//            public Teste(){
-//                this.teste = "BLAASSSS";
-//                this.list = new ArrayList<Teste2>(){{
-//                    add(new Teste2("OLA"));
-//                    add(new Teste2("HELLO"));
-//                }};
-//            }
-//        }
-//
-//        Teste teste = new Teste();
-
         return ResponseEntity.ok(returnObj);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ReturnObjectSingle> update (
+    public ResponseEntity<ReturnObj> update (
              @PathVariable(value = "id")long id, @RequestBody Person person) throws PersonNotFoundExeption {
 
         person.setId(personService.GetPersonById(id).getId());
         personService.updatePerson(person);
 
-        ReturnObjectSingle object = new ReturnObjectSingle("Ok","Person Updated");
-        object.add(linkTo(methodOn(PersonController.class).readById(person.getId())).withSelfRel().withType("GET"));
-        object.add(linkTo(methodOn(PersonController.class).delete(person.getId())).withRel("Delete").withType("DELETE"));
-        return  ResponseEntity.ok(object);
+        List<ReturnObjectSingle> returnList = ResponseSingleCreator(person);
+        ReturnObj returnObj = new ReturnObj("Ok","Person Updated",returnList);
+
+
+        return  ResponseEntity.ok(returnObj);
 
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ReturnObjectSingle> delete (@PathVariable(value = "id") long id) throws PersonNotFoundExeption {
+    public ResponseEntity<ReturnObj> delete (@PathVariable(value = "id") long id) throws PersonNotFoundExeption {
 
         personService.deletePerson(id);
-        ReturnObjectSingle object = new ReturnObjectSingle("deleted","Person Deleted");
-        object.add(linkTo(PersonController.class).withRel("index"));
+        ReturnObj object = new ReturnObj("deleted","Person Deleted");
         return ResponseEntity.ok(object);
     }
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<ReturnObjectSingle> readById(@PathVariable(value = "id") long id) throws PersonNotFoundExeption {
+    public ResponseEntity<ReturnObj> readById(@PathVariable(value = "id") long id) throws PersonNotFoundExeption {
+
         Person person = personService.GetPersonById(id);
-        ReturnObjectSingle object = new ReturnObjectSingle("Ok","Person retrieved",person);
-        object.add(linkTo(methodOn(PersonController.class).readById(person.getId())).withSelfRel().withType("GET"));
-        object.add(linkTo(methodOn(PersonController.class).delete(person.getId())).withRel("Delete").withType("DELETE"));
-        return ResponseEntity.ok(object);
+
+        List<ReturnObjectSingle> returnList = ResponseSingleCreator(person);
+        ReturnObj returnObj = new ReturnObj("Ok","Person retrieved",returnList);
+        return  ResponseEntity.ok(returnObj);
+    }
+
+    private List<ReturnObjectSingle> ResponseSingleCreator(@RequestBody Person person) throws PersonNotFoundExeption {
+        List<ReturnObjectSingle> returnList = new ArrayList<>();
+        ReturnObjectSingle obj = new ReturnObjectSingle(person);
+        obj.add(linkTo(methodOn(PersonController.class).readById(person.getId())).withSelfRel().withType("GET"));
+        obj.add(linkTo(methodOn(PersonController.class).delete(person.getId())).withRel("Delete").withType("DELETE"));
+        returnList.add(obj);
+        return returnList;
     }
 
     private void ResponseListCreator(List<Person> people, List<ReturnObjectSingle> returnList) throws PersonNotFoundExeption {

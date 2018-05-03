@@ -5,17 +5,22 @@ import org.springframework.hateoas.ResourceSupport;
 import java.util.List;
 
 
-public class ReturnObj extends ResourceSupport {
+public class ReturnObj  {
     private String status;
     private String message;
-    private List<ReturnObjectSingle> obj;
+    private List<ReturnObjectSingle> people;
 
     public ReturnObj(){}
 
-    public ReturnObj(String status, String message, List<ReturnObjectSingle> obj) {
+    public ReturnObj(String status, String message) {
         this.status = status;
         this.message = message;
-        this.obj = obj;
+    }
+
+    public ReturnObj(String status, String message, List<ReturnObjectSingle> people) {
+        this.status = status;
+        this.message = message;
+        this.people = people;
     }
 
     public String getStatus() {
@@ -34,12 +39,12 @@ public class ReturnObj extends ResourceSupport {
         this.message = message;
     }
 
-    public List<ReturnObjectSingle> getObj() {
-        return obj;
+    public List<ReturnObjectSingle> getPeople() {
+        return people;
     }
 
-    public void setObj(List<ReturnObjectSingle> obj) {
-        this.obj = obj;
+    public void setPeople(List<ReturnObjectSingle> people) {
+        this.people = people;
     }
 
     @Override
@@ -47,7 +52,7 @@ public class ReturnObj extends ResourceSupport {
         return "ReturnObj{" +
                 "status='" + this.status + '\'' +
                 ", message='" + this.message + '\'' +
-                ", obj=" + this.obj +
+                ", people=" + this.people +
                 '}';
     }
 }
