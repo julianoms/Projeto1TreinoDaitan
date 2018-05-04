@@ -1,6 +1,5 @@
 package br.com.project.crud.utils;
 
-import org.springframework.hateoas.ResourceSupport;
 
 import java.util.List;
 

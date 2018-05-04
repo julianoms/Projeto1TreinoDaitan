@@ -2,7 +2,7 @@ package br.com.project.crud.services;
 
 import br.com.project.crud.daos.PersonRepository;
 import br.com.project.crud.models.Person;
-import br.com.project.crud.utils.PersonNotFoundExeption;
+import br.com.project.crud.utils.PersonNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -23,21 +23,21 @@ public class PersonService {
     private PersonRepository personRepository;
 
     @Cacheable(value = "person",key = "#id")
-    public Person GetPersonById(long id) throws PersonNotFoundExeption {
+    public Person getPersonById(long id) throws PersonNotFoundException {
 
         if (!personRepository.findById(id).isPresent()){
-            throw new PersonNotFoundExeption(id);
+            throw new PersonNotFoundException(id);
         }
         return personRepository.findById(id).get();
     }
 
-    public List<Person> GetPeople(){
+    public List<Person> getPeople(){
         List<Person> list = new ArrayList<>();
         personRepository.findAll().forEach(list::add);
         return list;
     }
     @Transactional(propagation = Propagation.REQUIRED,readOnly = false)
-    public void CreatePerson(Person person){
+    public void createPerson(Person person){
         personRepository.save(person);
     }
 
@@ -45,19 +45,19 @@ public class PersonService {
     @Caching(
             evict = @CacheEvict(value = "person",key = "#person.id"),
             put = @CachePut(value = "person",key = "#person.id"))
-    public void updatePerson(Person person) throws PersonNotFoundExeption {
+    public void updatePerson(Person person) throws PersonNotFoundException {
         if (!personRepository.findById(person.getId()).isPresent()) {
-            throw new PersonNotFoundExeption(person.getId());
+            throw new PersonNotFoundException(person.getId());
         }
         personRepository.save(person);
     }
 
     @Transactional(propagation = Propagation.REQUIRED,readOnly = false)
     @CacheEvict(value = "person",key = "#id")
-    public void deletePerson(long id) throws PersonNotFoundExeption {
+    public void deletePerson(long id) throws PersonNotFoundException {
 
         if (!personRepository.findById(id).isPresent()){
-            throw new PersonNotFoundExeption(id);
+            throw new PersonNotFoundException(id);
         }
         personRepository.deleteById(id);
     }

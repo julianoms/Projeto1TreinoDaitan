@@ -1,18 +1,15 @@
 package br.com.project.crud.controllers;
 
 import br.com.project.crud.models.Person;
-import br.com.project.crud.utils.PersonNotFoundExeption;
+import br.com.project.crud.utils.PersonNotFoundException;
 import br.com.project.crud.utils.ReturnObj;
 import br.com.project.crud.utils.ReturnObjectSingle;
 import br.com.project.crud.services.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
-import org.springframework.hateoas.ResourceSupport;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,9 +24,9 @@ public class PersonController {
     private PersonService personService;
 
     @PostMapping
-    public ResponseEntity<ReturnObj> create(@RequestBody Person person) throws PersonNotFoundExeption {
+    public ResponseEntity<ReturnObj> create(@RequestBody Person person) throws PersonNotFoundException {
 
-        personService.CreatePerson(person);
+        personService.createPerson(person);
 
         List<ReturnObjectSingle> returnList = ResponseSingleCreator(person);
         ReturnObj returnObj = new ReturnObj("Ok","Person Created",returnList);
@@ -41,7 +38,7 @@ public class PersonController {
 
     @GetMapping
     public ResponseEntity<ReturnObj> read(@Param(value = "name")String name,
-                                          @Param (value = "country")String country) throws PersonNotFoundExeption {
+                                          @Param (value = "country")String country) throws PersonNotFoundException {
 
         List<ReturnObjectSingle> returnList = new ArrayList<>();
 
@@ -58,7 +55,7 @@ public class PersonController {
             return ResponseEntity.ok(returnObj);
         }
 
-        List<Person> people = personService.GetPeople();
+        List<Person> people = personService.getPeople();
 
         ResponseListCreator(people, returnList);
         ReturnObj returnObj = new ReturnObj("Ok","List of all people:",returnList);
@@ -67,9 +64,9 @@ public class PersonController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ReturnObj> update (
-             @PathVariable(value = "id")long id, @RequestBody Person person) throws PersonNotFoundExeption {
+             @PathVariable(value = "id")long id, @RequestBody Person person) throws PersonNotFoundException {
 
-        person.setId(personService.GetPersonById(id).getId());
+        person.setId(personService.getPersonById(id).getId());
         personService.updatePerson(person);
 
         List<ReturnObjectSingle> returnList = ResponseSingleCreator(person);
@@ -81,7 +78,7 @@ public class PersonController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ReturnObj> delete (@PathVariable(value = "id") long id) throws PersonNotFoundExeption {
+    public ResponseEntity<ReturnObj> delete (@PathVariable(value = "id") long id) throws PersonNotFoundException {
 
         personService.deletePerson(id);
         ReturnObj object = new ReturnObj("deleted","Person Deleted");
@@ -90,16 +87,16 @@ public class PersonController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<ReturnObj> readById(@PathVariable(value = "id") long id) throws PersonNotFoundExeption {
+    public ResponseEntity<ReturnObj> readById(@PathVariable(value = "id") long id) throws PersonNotFoundException {
 
-        Person person = personService.GetPersonById(id);
+        Person person = personService.getPersonById(id);
 
         List<ReturnObjectSingle> returnList = ResponseSingleCreator(person);
         ReturnObj returnObj = new ReturnObj("Ok","Person retrieved",returnList);
         return  ResponseEntity.ok(returnObj);
     }
 
-    private List<ReturnObjectSingle> ResponseSingleCreator(@RequestBody Person person) throws PersonNotFoundExeption {
+    private List<ReturnObjectSingle> ResponseSingleCreator(Person person) throws PersonNotFoundException {
         List<ReturnObjectSingle> returnList = new ArrayList<>();
         ReturnObjectSingle obj = new ReturnObjectSingle(person);
         obj.add(linkTo(methodOn(PersonController.class).readById(person.getId())).withSelfRel().withType("GET"));
@@ -108,7 +105,7 @@ public class PersonController {
         return returnList;
     }
 
-    private void ResponseListCreator(List<Person> people, List<ReturnObjectSingle> returnList) throws PersonNotFoundExeption {
+    private void ResponseListCreator(List<Person> people, List<ReturnObjectSingle> returnList) throws PersonNotFoundException {
         ReturnObjectSingle object;
         for(Person person:people){
             object = new ReturnObjectSingle(person);

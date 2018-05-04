@@ -14,7 +14,6 @@ public class ReturnObjectSingle extends ResourceSupport {
         this.person = person;
     }
 
-
     public Person getPerson() {
         return this.person;
     }

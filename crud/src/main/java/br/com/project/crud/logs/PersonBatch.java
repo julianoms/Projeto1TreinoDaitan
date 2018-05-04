@@ -23,7 +23,7 @@ public class PersonBatch {
     public void cronJob() {
         logger.info("***** > ScheduleJob *****");
 
-        Collection<Person> people = personService.GetPeople();
+        Collection<Person> people = personService.getPeople();
         logger.info("There are {} People in the data base.",
                 people.size());
 
