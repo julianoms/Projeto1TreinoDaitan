@@ -68,6 +68,7 @@ public class PersonService {
     public List<Person> getPersonByCountry(String country){
         return personRepository.findByCountry(country);
     }
+    public List<Person> getPersonByNameAndCountry(String name, String country){return  personRepository.findByNameAndCountry(name,country);}
 
     @CacheEvict(value = "person",allEntries = true)
     public void evictCache(){}

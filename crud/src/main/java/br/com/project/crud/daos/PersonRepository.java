@@ -13,4 +13,6 @@ public interface PersonRepository extends CrudRepository<Person,Long> {
 
     List<Person> findByCountry(String country);
 
+    List<Person> findByNameAndCountry(String name, String country);
+
 }

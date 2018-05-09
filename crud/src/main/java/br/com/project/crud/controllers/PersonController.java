@@ -42,6 +42,12 @@ public class PersonController {
 
         List<ReturnObjectSingle> returnList = new ArrayList<>();
 
+        if(name != null && country != null){
+            List<Person> people = personService.getPersonByNameAndCountry(name,country);
+            ResponseListCreator(people, returnList);
+            ReturnObj returnObj = new ReturnObj("Ok","List of people named :"+name + " from :"+country,returnList);
+            return ResponseEntity.ok(returnObj);
+        }
         if(name != null) {
             List<Person> people = personService.getPersonByName(name);
             ResponseListCreator(people, returnList);
