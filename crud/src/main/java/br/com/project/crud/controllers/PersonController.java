@@ -29,10 +29,10 @@ public class PersonController {
         personService.createPerson(person);
 
         List<ReturnObjectSingle> returnList = ResponseSingleCreator(person);
-        ReturnObj returnObj = new ReturnObj("Ok","Person Created",returnList);
+        ReturnObj returnObj = new ReturnObj("Created","Person Created",returnList);
 
 
-        return  ResponseEntity.ok(returnObj);
+        return  ResponseEntity.status(201).body(returnObj);
     }
 
 
